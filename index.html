@@ -6,9 +6,183 @@
   <meta name="theme-color" content="#f5f3ee">
   <meta name="description" content="80 perguntas sobre O Hobbit e O Senhor dos Anéis, com quatro dificuldades e progresso salvo. Um quiz gratuito que funciona offline.">
   <title>Terra-média — Quiz Tolkien</title>
-  <link rel="stylesheet" href="styles.css">
-  <script src="questions.js" defer></script>
-  <script src="script.js" defer></script>
+  <style>
+:root {
+  color-scheme: light;
+  --paper: #f5f3ee;
+  --panel: #fffefa;
+  --ink: #1a2420;
+  --ink-2: #4f5a52;
+  --muted: #778077;
+  --green: #244b3c;
+  --green-dark: #193a30;
+  --gold: #af8755;
+  --line: #e4e5dc;
+  --pale: #e9eee7;
+  --wrong: #9d4642;
+  --wrong-bg: #f9eeeb;
+  --success: #21664a;
+  --success-bg: #e8f3eb;
+  --radius: 20px;
+  --shadow: 0 12px 40px rgba(25, 48, 36, .045);
+  font-synthesis: none;
+}
+*, *::before, *::after { box-sizing: border-box; }
+html { min-width: 300px; scroll-behavior: smooth; }
+body { min-height: 100vh; margin: 0; color: var(--ink); background: var(--paper); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; line-height: 1.5; -webkit-font-smoothing: antialiased; }
+button { font: inherit; cursor: pointer; }
+button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
+button:disabled { cursor: default; }
+.container { width: min(100% - 48px, 1040px); margin-inline: auto; }
+.app-shell { display: flex; flex-direction: column; min-height: 100vh; }
+.topbar { display: flex; align-items: center; height: 94px; gap: 11px; border-bottom: 1px solid var(--line); flex-shrink: 0; }
+.brand-icon { display: inline-flex; align-items: center; justify-content: center; width: 35px; height: 35px; border: 1px solid #c7d2c8; border-radius: 50%; color: var(--green); font-size: 20px; }
+.brand-name { font-size: 13px; font-weight: 800; letter-spacing: .145em; white-space: nowrap; }
+.brand-dash { color: #a7ae9f; }
+.topbar-label { font-size: 10px; margin-left: auto; font-weight: 750; letter-spacing: .18em; color: var(--muted); }
+main { flex: 1; }
+.eyebrow { font-size: 10px; line-height: 1.5; color: var(--green); font-weight: 800; letter-spacing: .19em; text-transform: uppercase; }
+h1,h2,h3,p { margin-top: 0; }
+h1,h2,.serif { font-family: "Iowan Old Style", "Baskerville", "Palatino Linotype", Georgia, serif; font-weight: 500; }
+h1 { font-size: clamp(43px, 6.2vw, 78px); line-height: 1.09; letter-spacing: -.06em; }
+h1 em { color: var(--green); font-weight: 400; }
+h2 { letter-spacing: -.035em; }
+p { color: var(--ink-2); }
+.hero { padding: 70px 0 52px; position: relative; }
+.hero-inner { max-width: 770px; }
+.hero h1 { margin: 16px 0 23px; }
+.hero p { max-width: 540px; font-size: 16px; line-height: 1.8; }
+.stat-line { display: flex; gap: 26px; margin-top: 32px; color: var(--muted); font-size: 12px; }
+.stat-line span { display: inline-flex; align-items: center; gap: 9px; }
+.stat-dot { width: 5px; height: 5px; background: var(--gold); border-radius: 50%; }
+.section-label { display: flex; align-items: center; justify-content: space-between; gap: 20px; margin-bottom: 20px; }
+.section-label h2 { font: 700 12px/1.3 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; text-transform: uppercase; letter-spacing: .145em; margin: 0; }
+.section-label span { color: var(--muted); font-size: 12px; }
+.filterbar { display: inline-flex; padding: 4px; background: #ebede6; border-radius: 12px; gap: 3px; margin-bottom: 28px; flex-wrap: wrap; }
+.filter { border: 0; padding: 10px 15px; font-size: 12px; color: var(--ink-2); background: transparent; border-radius: 9px; font-weight: 600; transition: background .2s, color .2s; }
+.filter:hover { color: var(--ink); }
+.filter.is-active { color: var(--green-dark); background: var(--panel); box-shadow: 0 1px 6px rgba(0,0,0,.06); }
+.level-grid { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 14px; }
+.level-card { min-height: 186px; background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 28px 28px 22px; text-align: left; display: flex; flex-direction: column; align-items: stretch; position: relative; transition: transform .22s, border-color .22s, box-shadow .22s; }
+.level-card:hover { transform: translateY(-3px); border-color: #b8c6b7; box-shadow: var(--shadow); }
+.level-card-top { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+.level-index { font-size: 11px; color: var(--muted); font-weight: 700; letter-spacing: .08em; }
+.level-arrow { font-size: 20px; line-height: 1; color: var(--green); }
+.level-card h3 { font: 500 30px/1.12 "Iowan Old Style", "Palatino Linotype", Georgia, serif; letter-spacing: -.035em; margin: 18px 0 8px; }
+.level-card p { font-size: 13px; margin: 0; }
+.level-bottom { margin-top: auto; padding-top: 22px; display: flex; justify-content: space-between; gap: 10px; font-size: 11px; color: var(--muted); }
+.level-best { color: var(--green); font-weight: 700; }
+.resume { display: flex; justify-content: space-between; align-items: center; gap: 20px; background: var(--green); border-radius: var(--radius); padding: 20px 24px; margin: 0 0 35px; color: #fff; }
+.resume .eyebrow { color: #c6d8c5; font-size: 9px; }
+.resume-title { color: #fff; font-weight: 700; margin: 4px 0 3px; }
+.resume-sub { color: #c7d9c8; font-size: 12px; }
+.resume-btn { padding: 11px 17px; background: #fffdf6; border: none; border-radius: 10px; font-weight: 750; color: var(--green); font-size: 12px; white-space: nowrap; }
+.footer { font-size: 11px; color: var(--muted); border-top: 1px solid var(--line); margin-top: 55px; padding: 20px 0 32px; display: flex; justify-content: space-between; gap: 18px; }
+.footer span:last-child { text-align: right; }
+.quiz-shell { width: min(100%, 760px); margin: 0 auto; padding: 36px 0 0; }
+.back-link { padding: 0; display: inline-flex; align-items: center; gap: 9px; color: var(--muted); background: none; border: 0; font-size: 12px; font-weight: 650; }
+.back-link:hover { color: var(--ink); }
+.progress-head { margin: 36px 0 13px; display: flex; justify-content: space-between; align-items: baseline; gap: 20px; font-size: 12px; }
+.progress-head strong { font-size: 12px; }
+.progress-head span { color: var(--muted); }
+.progress-track { height: 5px; background: #dfe5dc; border-radius: 50px; overflow: hidden; }
+.progress-fill { background: var(--green); height: 100%; border-radius: 50px; transition: width .3s; }
+.question-panel { background: var(--panel); border: 1px solid var(--line); border-radius: 24px; padding: clamp(24px, 5.5vw, 48px); box-shadow: var(--shadow); margin-top: 27px; }
+.question-meta { display: flex; gap: 9px; align-items: center; flex-wrap: wrap; }
+.pill { display: inline-flex; align-items: center; border: 1px solid #d9e3d8; color: #45664e; font-size: 10px; font-weight: 750; letter-spacing: .025em; padding: 6px 10px; border-radius: 50px; background: #f5f8f2; }
+.pill.alt { color: var(--ink-2); background: #f5f4ee; border-color: var(--line); }
+.question-panel h2 { font-size: clamp(27px, 3.8vw, 40px); line-height: 1.3; margin: 25px 0 30px; }
+.choices { display: grid; gap: 10px; }
+.choice { min-height: 65px; padding: 13px 17px; background: #fffefa; border: 1px solid var(--line); border-radius: 12px; display: flex; align-items: center; gap: 15px; text-align: left; color: var(--ink); transition: border-color .15s, background .15s, transform .15s; }
+.choice:not(:disabled):hover { background: #f1f5ef; border-color: #aec3ae; transform: translateX(2px); }
+.choice-key { flex: 0 0 31px; height: 31px; display: grid; place-items: center; border-radius: 8px; background: #f2f2ec; color: var(--muted); font-size: 11px; font-weight: 800; }
+.choice-text { font-size: 13px; line-height: 1.45; font-weight: 600; }
+.choice-icon { margin-left: auto; font-size: 16px; line-height: 1; font-weight: 800; }
+.choice.is-correct { border-color: #8ec3a2; background: var(--success-bg); color: #155038; }
+.choice.is-correct .choice-key { background: #d3eadd; color: var(--success); }
+.choice.is-wrong { border-color: #d7aaa5; background: var(--wrong-bg); color: var(--wrong); }
+.choice.is-wrong .choice-key { background: #f2dcd8; color: var(--wrong); }
+.choice:disabled:not(.is-correct):not(.is-wrong) { opacity: .55; }
+.feedback { padding: 21px 0 0; margin-top: 22px; border-top: 1px solid var(--line); animation: slide-in .2s ease both; }
+.feedback-head { font-weight: 800; font-size: 14px; color: var(--success); margin-bottom: 7px; }
+.feedback-head.bad { color: var(--wrong); }
+.feedback p { font-size: 13px; line-height: 1.75; margin-bottom: 20px; }
+.primary-btn { background: var(--green); color: white; border: 1px solid var(--green); padding: 15px 23px; border-radius: 11px; font-size: 13px; font-weight: 760; display: inline-flex; align-items: center; justify-content: center; gap: 18px; transition: background .2s, transform .2s; }
+.primary-btn:hover { background: #163b2d; transform: translateY(-1px); }
+.secondary-btn { background: #fffefa; color: var(--ink); border: 1px solid #cfd7cd; padding: 15px 23px; border-radius: 11px; font-size: 13px; font-weight: 730; }
+.secondary-btn:hover { background: #eff2eb; }
+.quiz-hint { margin: 19px 0; color: var(--muted); font-size: 11px; text-align: center; }
+.result-shell { width: min(100%, 700px); margin: 0 auto; padding: 40px 0 0; }
+.result-panel { margin-top: 29px; background: var(--panel); border-radius: 24px; border: 1px solid var(--line); padding: clamp(25px, 6vw, 48px); text-align: center; }
+.result-panel h1 { font-size: clamp(39px, 6vw, 59px); margin: 12px 0; }
+.result-subtitle { font-size: 13px; line-height: 1.7; max-width: 425px; margin: 0 auto 25px; }
+.score-circle { width: 175px; height: 175px; display: grid; place-items: center; margin: 0 auto 26px; border-radius: 50%; background: conic-gradient(var(--green) var(--score), #e9ede6 0); }
+.score-inner { width: 150px; height: 150px; background: var(--panel); border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.score-value { font: 500 50px/1 Georgia, serif; letter-spacing: -.05em; }
+.score-small { color: var(--muted); font-size: 11px; margin-top: 6px; }
+.result-summary { display: flex; justify-content: center; gap: 30px; margin-bottom: 29px; }
+.result-summary div { display: flex; flex-direction: column; gap: 4px; }
+.result-summary strong { font-size: 21px; }
+.result-summary span { color: var(--muted); font-size: 11px; }
+.result-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; }
+.review-panel { margin-top: 24px; background: var(--panel); border: 1px solid var(--line); border-radius: 18px; overflow: hidden; }
+.review-toggle { display: flex; justify-content: space-between; width: 100%; border: 0; background: transparent; color: var(--ink); padding: 23px 26px; font-size: 13px; font-weight: 800; text-align: left; }
+.review-body { border-top: 1px solid var(--line); padding: 0 26px; }
+.review-item { padding: 22px 0; border-bottom: 1px solid var(--line); }
+.review-item:last-child { border: 0; }
+.review-number { color: var(--muted); font-size: 10px; text-transform: uppercase; font-weight: 750; letter-spacing: .12em; }
+.review-question { font-size: 14px; font-weight: 750; margin: 8px 0 12px; }
+.review-line { font-size: 12px; margin: 0 0 7px; }
+.review-line strong { color: var(--ink); }
+.review-line.mine { color: var(--wrong); }
+.review-line.right { color: var(--success); }
+.review-explanation { margin: 9px 0 0; font-size: 12px; line-height: 1.7; }
+.empty-review { padding: 20px 0; color: var(--muted); font-size: 13px; }
+.loading { color: var(--muted); text-align: center; padding: 100px 0; }
+.noscript { padding: 20px; font-size: 14px; text-align: center; }
+@keyframes slide-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+@media(max-width: 650px) {
+ .container { width: min(100% - 32px, 1040px); }
+ .topbar { height: 76px; }
+ .hero { padding: 48px 0 35px; }
+ .hero h1 { margin: 13px 0 18px; }
+ .hero p { font-size: 14px; }
+ .stat-line { margin-top: 22px; gap: 15px; flex-wrap: wrap; font-size: 11px; }
+ .section-label { align-items: flex-start; }
+ .section-label span { white-space: nowrap; }
+ .filterbar { display: flex; width: 100%; }
+ .filter { flex: 1 1 auto; padding: 10px 7px; font-size: 11px; }
+ .level-grid { grid-template-columns: 1fr; gap: 11px; }
+ .level-card { padding: 21px; min-height: 151px; }
+ .level-card h3 { font-size: 28px; margin: 10px 0 6px; }
+ .level-bottom { padding-top: 14px; }
+ .resume { padding: 18px; gap: 9px; }
+ .resume-btn { padding: 10px 12px; }
+ .footer { margin-top: 32px; flex-direction: column; gap: 5px; }
+ .footer span:last-child { text-align: left; }
+ .quiz-shell { padding-top: 24px; }
+ .progress-head { margin-top: 24px; }
+ .question-panel { padding: 24px 18px; border-radius: 19px; margin-top: 20px; }
+ .question-panel h2 { margin: 20px 0 24px; }
+ .choice { min-height: 60px; padding: 11px 12px; gap: 11px; }
+ .choice-key { flex-basis: 29px; height: 29px; }
+ .choice-text { font-size: 12px; }
+ .feedback p { font-size: 12px; }
+ .primary-btn,.secondary-btn { padding: 14px 17px; }
+ .result-shell { padding-top: 24px; }
+ .result-panel { margin-top: 20px; border-radius: 19px; padding: 28px 18px; }
+ .score-circle { width: 155px; height: 155px; }
+ .score-inner { width: 132px; height: 132px; }
+ .result-actions { flex-direction: column; }
+ .result-actions button { width: 100%; }
+ .review-toggle { padding: 20px 18px; }
+ .review-body { padding: 0 18px; }
+}
+@media(max-width: 350px) { .brand-name { font-size: 11px; } .hide-mobile { display: none; } .hero h1 { font-size: 38px; } }
+@media(prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; scroll-behavior: auto !important; } }
+
+  </style>
+
 </head>
 <body>
   <div id="app" class="app-shell">
@@ -20,5 +194,353 @@
     <main class="container loading" aria-busy="true">Preparando a sua jornada…</main>
   </div>
   <noscript><div class="noscript">Este quiz precisa de JavaScript ativado no navegador.</div></noscript>
+  <script>
+/*
+ * Banco de 80 questões — 20 por dificuldade, 10 por obra em cada nível.
+ * Fontes narrativas: O Hobbit e O Senhor dos Anéis, de J. R. R. Tolkien.
+ * O enredo dos livros prevalece sobre as adaptações cinematográficas.
+ * Estrutura: [id, dificuldade, obra, pergunta, 4 alternativas, índice correto, explicação].
+ */
+const QUESTIONS = [
+  // ────────────────────── FÁCIL | O HOBBIT ──────────────────────
+  ["FH01", "facil", "hobbit", "Quem é o hobbit protagonista de O Hobbit?", ["Frodo Bolseiro", "Bilbo Bolseiro", "Samwise Gamgi", "Peregrin Tûk"], 1, "Bilbo Bolseiro é o hobbit recrutado para participar da expedição à Montanha Solitária."],
+  ["FH02", "facil", "hobbit", "Qual mago visita a casa de Bilbo e o envolve na aventura?", ["Radagast", "Saruman", "Gandalf", "Alatar"], 2, "Gandalf organiza a visita dos anões e convence Bilbo a viajar com eles."],
+  ["FH03", "facil", "hobbit", "O que Thorin deseja recuperar na Montanha Solitária?", ["O trono de Gondor", "O reino e o tesouro de seus antepassados", "O Anel de Sauron", "As terras de Rohan"], 1, "Thorin busca reconquistar Erebor e as riquezas tomadas de seus ancestrais pelo dragão."],
+  ["FH04", "facil", "hobbit", "Qual é o nome do dragão que tomou Erebor?", ["Glaurung", "Ancalagon", "Scatha", "Smaug"], 3, "Smaug expulsou os anões da Montanha Solitária e passou a dormir sobre o tesouro."],
+  ["FH05", "facil", "hobbit", "A qual criatura pertencia o anel encontrado por Bilbo nas Montanhas Sombrias?", ["Gollum", "Elrond", "Thranduil", "Balin"], 0, "Bilbo encontra o anel perdido por Gollum nos túneis subterrâneos, antes do jogo de adivinhas."],
+  ["FH06", "facil", "hobbit", "Quem lidera os anões na expedição?", ["Balin", "Dáin", "Thorin Escudo-de-Carvalho", "Glóin"], 2, "Thorin Escudo-de-Carvalho é o herdeiro da linhagem real de Erebor e líder do grupo."],
+  ["FH07", "facil", "hobbit", "Em que animal Beorn é capaz de se transformar?", ["Lobo", "Urso", "Águia", "Cavalo"], 1, "Beorn é um troca-peles que assume a forma de um grande urso."],
+  ["FH08", "facil", "hobbit", "Qual cidade é incendiada por Smaug?", ["Bri", "Edoras", "Cidade do Lago (Esgaroth)", "Valfenda"], 2, "Smaug ataca Esgaroth depois de suspeitar que os moradores auxiliaram os intrusos."],
+  ["FH09", "facil", "hobbit", "Quem finalmente mata Smaug?", ["Thorin", "Bard", "Bilbo", "Gandalf"], 1, "Bard, um arqueiro da Cidade do Lago, atinge o ponto desprotegido do dragão."],
+  ["FH10", "facil", "hobbit", "Qual anão da companhia é pai de Gimli?", ["Glóin", "Dwalin", "Bofur", "Óin"], 0, "Glóin integra a expedição de Thorin e é pai de Gimli, futuro membro da Sociedade do Anel."],
+
+  // ───────────────── FÁCIL | O SENHOR DOS ANÉIS ─────────────────
+  ["FL01", "facil", "lotr", "Quem recebe a missão de levar o Um Anel para longe do Condado?", ["Merry", "Frodo", "Pippin", "Boromir"], 1, "Frodo se torna o portador do Anel após herdá-lo de Bilbo."],
+  ["FL02", "facil", "lotr", "Qual hobbit acompanha Frodo até Mordor?", ["Sam", "Merry", "Bilbo", "Pippin"], 0, "Samwise Gamgi permanece ao lado de Frodo até os momentos finais da jornada."],
+  ["FL03", "facil", "lotr", "Como se chama a região em que Frodo vivia antes da jornada?", ["Gondor", "Condado", "Rohan", "Mordor"], 1, "O Condado é a região rural habitada por muitos hobbits, incluindo Frodo e Bilbo."],
+  ["FL04", "facil", "lotr", "Quem forjou o Um Anel?", ["Saruman", "Elrond", "Sauron", "Isildur"], 2, "Sauron forjou o Um Anel na Montanha da Perdição para dominar os demais Anéis de Poder."],
+  ["FL05", "facil", "lotr", "Qual personagem é herdeiro do trono de Gondor?", ["Éomer", "Aragorn", "Faramir", "Théoden"], 1, "Aragorn descende de Isildur e acaba coroado rei do Reino Reunido."],
+  ["FL06", "facil", "lotr", "Qual reino é conhecido por seus cavaleiros?", ["Moria", "Rohan", "Valfenda", "Lórien"], 1, "Rohan é célebre por seus cavaleiros, os Rohirrim, e por sua tradição equestre."],
+  ["FL07", "facil", "lotr", "Em qual reino élfico Galadriel acolhe a Sociedade?", ["Floresta das Trevas", "Valfenda", "Lothlórien", "Lindon"], 2, "Galadriel e Celeborn governam Lothlórien, floresta visitada após a saída de Moria."],
+  ["FL08", "facil", "lotr", "A qual povo pertence Legolas?", ["Homens", "Anões", "Hobbits", "Elfos"], 3, "Legolas é um elfo da Floresta das Trevas e acompanha a Sociedade do Anel."],
+  ["FL09", "facil", "lotr", "Onde o Um Anel precisa ser destruído?", ["Abismo de Helm", "Montanha da Perdição", "Moria", "Torre de Orthanc"], 1, "O Anel deve voltar ao fogo da Montanha da Perdição, onde foi forjado."],
+  ["FL10", "facil", "lotr", "Qual criatura guia Frodo e Sam por parte de sua jornada?", ["Barbárvore", "Laracna", "Gollum", "Um Nazgûl"], 2, "Gollum conhece caminhos para Mordor e passa a servir como guia dos dois hobbits."],
+
+  // ────────────────────── MÉDIO | O HOBBIT ──────────────────────
+  ["MH01", "medio", "hobbit", "Quantos anões acompanham Bilbo na expedição a Erebor?", ["Doze", "Treze", "Quatorze", "Onze"], 1, "A companhia tem treze anões, além de Bilbo; Gandalf os acompanha apenas em parte da viagem."],
+  ["MH02", "medio", "hobbit", "Qual é o nome da espada curta usada por Bilbo?", ["Orcrist", "Andúril", "Ferroada", "Glamdring"], 2, "Bilbo chama a lâmina élfica de Ferroada, conhecida em inglês como Sting."],
+  ["MH03", "medio", "hobbit", "Quem acolhe a companhia em Valfenda e examina o mapa dos anões?", ["Círdan", "Elrond", "Celeborn", "Thranduil"], 1, "Elrond recebe os viajantes e descobre inscrições lunares no mapa de Thrór."],
+  ["MH04", "medio", "hobbit", "Quem aprisiona os anões nos salões subterrâneos da Floresta das Trevas?", ["Trolls", "Homens de Dale", "Elfos da Floresta", "Águias"], 2, "Os elfos da Floresta capturam os anões; Bilbo permanece livre graças ao anel."],
+  ["MH05", "medio", "hobbit", "Como Bilbo retira os anões dos salões do rei élfico?", ["Usando um túnel de goblins", "Escondendo-os em barris", "Abrindo um portal mágico", "Montando águias"], 1, "Bilbo esconde os anões em barris que são transportados pelo rio até as proximidades da Cidade do Lago."],
+  ["MH06", "medio", "hobbit", "Qual animal comunica a Bard o ponto vulnerável de Smaug?", ["Um corvo", "Uma águia", "Um tordo", "Uma coruja"], 2, "Um tordo escuta Bilbo falar da falha na proteção do dragão e leva a notícia até Bard."],
+  ["MH07", "medio", "hobbit", "O que Bilbo entrega a Bard e ao rei élfico para negociar com Thorin?", ["Uma chave de ouro", "A Pedra Arken", "A espada Orcrist", "O mapa de Thrór"], 1, "Bilbo entrega a Pedra Arken, joia desejada por Thorin, na tentativa de evitar uma guerra."],
+  ["MH08", "medio", "hobbit", "Como se chama o rei dos elfos da Floresta das Trevas no legendário de Tolkien?", ["Gil-galad", "Elrond", "Thranduil", "Celeborn"], 2, "Thranduil é o rei élfico; em O Hobbit, o narrador normalmente o chama apenas de Rei dos Elfos."],
+  ["MH09", "medio", "hobbit", "Quem liberta os anões das aranhas gigantes na Floresta das Trevas?", ["Bard", "Bilbo", "Beorn", "Dáin"], 1, "Bilbo usa o anel, sua espada e provocações para distrair as aranhas e resgatar os companheiros."],
+  ["MH10", "medio", "hobbit", "Como Gandalf ajuda a derrotar os três trolls que capturam os viajantes?", ["Transforma-os em corvos", "Faz o sol nascer mais cedo", "Prolonga a discussão até o amanhecer", "Invoca o rio para arrastá-los"], 2, "Gandalf imita vozes durante a discussão dos trolls até que a luz do dia os transforma em pedra."],
+
+  // ───────────────── MÉDIO | O SENHOR DOS ANÉIS ─────────────────
+  ["ML01", "medio", "lotr", "Quantos membros formam a Sociedade do Anel em Valfenda?", ["Sete", "Oito", "Nove", "Dez"], 2, "A Sociedade reúne quatro hobbits, dois homens, um elfo, um anão e um mago."],
+  ["ML02", "medio", "lotr", "Quem assume a liderança da Sociedade depois da queda de Gandalf em Moria?", ["Boromir", "Legolas", "Aragorn", "Gimli"], 2, "Aragorn conduz os companheiros para fora de Moria e até Lothlórien."],
+  ["ML03", "medio", "lotr", "Em que fortaleza fica a torre de Orthanc, onde vive Saruman?", ["Dol Guldur", "Isengard", "Barad-dûr", "Minas Morgul"], 1, "Orthanc fica no centro de Isengard, domínio de Saruman ao sul das Montanhas Sombrias."],
+  ["ML04", "medio", "lotr", "Qual Ent encontra Merry e Pippin na floresta de Fangorn?", ["Folhaflauta", "Barbárvore", "Raizfunda", "Rápido-feixe"], 1, "Barbárvore, também chamado Treebeard, abriga os hobbits e participa da revolta dos Ents."],
+  ["ML05", "medio", "lotr", "Em que lugar Gandalf enfrenta um Balrog?", ["Moria", "Valfenda", "Cirith Ungol", "Osgiliath"], 0, "Gandalf confronta o Balrog na ponte de Khazad-dûm, nas minas de Moria."],
+  ["ML06", "medio", "lotr", "Quem desfere o golpe que mata o Rei Bruxo de Angmar?", ["Aragorn", "Éowyn", "Gandalf", "Faramir"], 1, "Éowyn mata o Rei Bruxo na Batalha dos Campos do Pelennor, com ajuda decisiva de Merry."],
+  ["ML07", "medio", "lotr", "Qual hobbit olha uma palantír e atrai a atenção de Sauron?", ["Frodo", "Sam", "Merry", "Pippin"], 3, "Pippin examina a pedra de Orthanc e é interrogado por Sauron."],
+  ["ML08", "medio", "lotr", "Como se chama a espada de Aragorn, reforjada dos fragmentos de Narsil?", ["Glamdring", "Andúril", "Orcrist", "Anglachel"], 1, "Andúril, a Chama do Oeste, é forjada a partir dos fragmentos da antiga espada de Elendil."],
+  ["ML09", "medio", "lotr", "Quem governa Gondor como Regente durante a Guerra do Anel?", ["Denethor II", "Théoden", "Éomer", "Elrond"], 0, "Denethor II é o Regente de Gondor e pai de Boromir e Faramir."],
+  ["ML10", "medio", "lotr", "Quem entrega a Frodo um frasco com a luz da estrela de Eärendil?", ["Arwen", "Éowyn", "Galadriel", "Goldberry"], 2, "Galadriel presenteia Frodo com o frasco que depois brilha diante de Laracna."],
+
+  // ───────────────────── DIFÍCIL | O HOBBIT ─────────────────────
+  ["DH01", "dificil", "hobbit", "Quais são as duas espadas élficas encontradas no esconderijo dos trolls e usadas por Gandalf e Thorin?", ["Andúril e Ferroada", "Glamdring e Orcrist", "Narsil e Angrist", "Aeglos e Herugrim"], 1, "Gandalf fica com Glamdring e Thorin com Orcrist, ambas antigas lâminas de Gondolin."],
+  ["DH02", "dificil", "hobbit", "Em qual cordilheira Bilbo encontra Gollum pela primeira vez?", ["Montanhas Azuis", "Montanhas Brancas", "Montanhas Sombrias", "Montanhas de Ferro"], 2, "O encontro ocorre em cavernas sob as Montanhas Sombrias, depois da captura do grupo por goblins."],
+  ["DH03", "dificil", "hobbit", "O que revela a fechadura da entrada secreta de Erebor?", ["O reflexo da lua cheia", "A última luz do sol no Dia de Durin", "A luz de uma estrela cadente", "O fogo aceso por Gandalf"], 1, "Um tordo bate na pedra e o último raio de sol do Dia de Durin revela a fechadura oculta."],
+  ["DH04", "dificil", "hobbit", "Qual condição astronômica caracteriza o Dia de Durin, segundo os anões?", ["A primeira lua da primavera", "A primeira noite sem estrelas", "O início do último mês lunar do outono, com sol e lua juntos no céu", "O solstício de verão"], 2, "Para os anões, o Dia de Durin é o primeiro dia do último mês lunar do outono, quando sol e lua podem ser vistos juntos."],
+  ["DH05", "dificil", "hobbit", "De onde Dáin Pé-de-Ferro conduz seus anões para auxiliar Thorin?", ["Montanhas Azuis", "Colinas de Ferro", "Ered Luin Ocidentais", "Montanhas Brancas"], 1, "Dáin chega a Erebor à frente de anões das Colinas de Ferro e depois se torna Rei sob a Montanha."],
+  ["DH06", "dificil", "hobbit", "O que acontece com a Pedra Arken após a morte de Thorin, no livro?", ["É devolvida ao tesouro de Smaug", "É lançada no Rio Corrente", "É colocada sobre o peito de Thorin em seu túmulo", "É enviada a Valfenda"], 2, "Bard deposita a Pedra Arken sobre o peito de Thorin quando ele é sepultado sob Erebor."],
+  ["DH07", "dificil", "hobbit", "Quem mata Bolg durante a Batalha dos Cinco Exércitos, no livro?", ["Beorn", "Thorin", "Dáin", "Legolas"], 0, "Beorn chega à batalha em forma de urso, derrota a guarda pessoal de Bolg e o mata."],
+  ["DH08", "dificil", "hobbit", "Que recompensa Bilbo leva do tesouro de Erebor para casa?", ["Um único colar de rubis", "Dois pequenos baús: um de ouro e outro de prata", "Uma coroa e uma espada", "Metade de todo o tesouro"], 1, "Bilbo recusa uma grande fortuna e aceita dois pequenos baús, um com ouro e outro com prata."],
+  ["DH09", "dificil", "hobbit", "O que Bilbo retira do tesouro de Smaug na primeira visita ao covil?", ["Um elmo de mithril", "Uma taça de ouro com duas alças", "A Pedra Arken", "Um mapa antigo"], 1, "Bilbo furta uma grande taça de duas alças; a perda desperta a ira de Smaug."],
+  ["DH10", "dificil", "hobbit", "Quais são os cinco exércitos que dão nome à batalha no romance?", ["Anões, elfos, homens, goblins e wargs", "Anões, elfos, homens, águias e Ents", "Anões, hobbits, orcs, trolls e homens", "Elfos, homens, anões, dragões e goblins"], 0, "As cinco forças consideradas são anões, elfos e homens contra goblins e wargs; águias e Beorn também intervêm."],
+
+  // ─────────────── DIFÍCIL | O SENHOR DOS ANÉIS ────────────────
+  ["DL01", "dificil", "lotr", "Em qual colina ocorre a ruptura da Sociedade do Anel e a morte de Boromir?", ["Amon Hen", "Amon Sûl", "Mindolluin", "Caradhras"], 0, "O grupo se dispersa na região de Amon Hen; Boromir morre ao defender Merry e Pippin."],
+  ["DL02", "dificil", "lotr", "Que nome recebeu Minas Ithil depois de ser dominada pelos Nazgûl?", ["Minas Tirith", "Minas Morgul", "Osgiliath", "Dol Amroth"], 1, "Minas Ithil, antiga Torre da Lua, passa a ser chamada Minas Morgul após cair sob o poder do inimigo."],
+  ["DL03", "dificil", "lotr", "Por qual grande rio a Sociedade viaja em barcos após deixar Lothlórien?", ["Brandevin", "Isen", "Anduin", "Bruinen"], 2, "Os membros da Sociedade descem o Anduin até a região das Argonath e de Amon Hen."],
+  ["DL04", "dificil", "lotr", "Qual é o nome do refúgio secreto de Faramir em Ithilien?", ["Henneth Annûn", "Cirith Ungol", "Abismo de Helm", "Caras Galadhon"], 0, "Henneth Annûn, a Janela do Poente, é o esconderijo em que Faramir recebe Frodo e Sam."],
+  ["DL05", "dificil", "lotr", "No livro, quem desencadeia a enchente do Bruinen contra os Nazgûl?", ["Aragorn", "Elrond", "Glorfindel", "Frodo"], 1, "Elrond controla a cheia do rio; Gandalf contribui dando forma de cavalos brancos às ondas."],
+  ["DL06", "dificil", "lotr", "Qual é a origem da lâmina com que Merry fere o Rei Bruxo, no romance?", ["Foi forjada em Gondolin", "Foi presente de Saruman", "Veio dos túmulos antigos nas Colinas dos Túmulos", "Foi retirada de Moria"], 2, "Merry usa uma adaga dos Túmulos, forjada no Norte contra o reino de Angmar; seu golpe rompe a proteção do inimigo."],
+  ["DL07", "dificil", "lotr", "No livro, quem manda acender os faróis de Gondor para pedir auxílio?", ["Denethor, por meio de seus homens", "Pippin, desobedecendo a Denethor", "Aragorn, por uma palantír", "Éowyn, de Dunharrow"], 0, "Ao contrário da cena do filme, os faróis já são acesos por ordem de Denethor quando Gandalf e Pippin chegam a Gondor."],
+  ["DL08", "dificil", "lotr", "Em que passagem montanhosa Frodo e Sam encontram o covil de Laracna?", ["Passagem de Rohan", "Cirith Ungol", "Portão de Rohan", "Alto Passo"], 1, "A criatura habita túneis próximos à passagem de Cirith Ungol, nas fronteiras de Mordor."],
+  ["DL09", "dificil", "lotr", "Quais reis antigos são representados pelas duas estátuas das Argonath, no livro?", ["Elendil e Isildur", "Isildur e Anárion", "Aragorn e Elessar", "Eärnur e Ecthelion"], 1, "As Argonath mostram Isildur e Anárion; os filmes retratam Isildur e Elendil."],
+  ["DL10", "dificil", "lotr", "Quem mata Saruman durante o Expurgo do Condado, no livro?", ["Frodo", "Gandalf", "Gríma Língua de Cobra", "Aragorn"], 2, "Gríma mata Saruman; em seguida, arqueiros hobbits matam Gríma."],
+
+  // ────────────────────── INSANO | O HOBBIT ─────────────────────
+  ["IH01", "insano", "hobbit", "Como se chama o avô de Thorin Escudo-de-Carvalho, antigo Rei sob a Montanha?", ["Thrór", "Náin", "Durin VI", "Fundin"], 0, "Thrór era o avô de Thorin, pai de Thráin II, e foi rei de Erebor antes da chegada de Smaug."],
+  ["IH02", "insano", "hobbit", "O que torna especiais as letras lunares descobertas por Elrond no mapa de Thrór?", ["Só aparecem perto de fogo", "Só podem ser lidas sob uma luz lunar apropriada", "Mudam a cada amanhecer", "Só são visíveis aos portadores de anéis"], 1, "As runas lunares são reveladas pela luz da lua; as mais secretas exigem fase e época do ano correspondentes à escrita."],
+  ["IH03", "insano", "hobbit", "De qual senhor de Valle (Dale) Bard é descendente?", ["Girion", "Eorl", "Ecthelion", "Brandir"], 0, "Bard descende de Girion, antigo senhor de Valle, morto durante o ataque de Smaug."],
+  ["IH04", "insano", "hobbit", "Qual líder é morto por Gandalf quando os viajantes são capturados nas Montanhas Sombrias?", ["Bolg", "O Grande Goblin", "Azog", "Dáin"], 1, "Gandalf mata o Grande Goblin durante a fuga; no romance, Azog já havia morrido antes desses acontecimentos."],
+  ["IH05", "insano", "hobbit", "Quantos anos Bilbo tem quando parte do Condado em abril de 2941 da Terceira Era?", ["40", "50", "60", "71"], 1, "Bilbo nasceu em setembro de 2890 e ainda tinha 50 anos quando iniciou a viagem em abril de 2941."],
+  ["IH06", "insano", "hobbit", "Quem entrega a Gandalf o mapa de Thrór e a chave da porta secreta de Erebor?", ["Thráin II", "Dáin II", "Balin", "Bard"], 0, "Gandalf recebe o mapa e a chave de Thráin II quando o encontra aprisionado em Dol Guldur."],
+  ["IH07", "insano", "hobbit", "Quais anões morrem defendendo Thorin na Batalha dos Cinco Exércitos?", ["Balin e Dwalin", "Bifur e Bofur", "Fíli e Kíli", "Óin e Glóin"], 2, "Os irmãos Fíli e Kíli são sobrinhos de Thorin e morrem protegendo-o na batalha."],
+  ["IH08", "insano", "hobbit", "Em qual ano da Terceira Era acontece a Batalha dos Cinco Exércitos?", ["2911", "2941", "2980", "3019"], 1, "A batalha acontece no fim de 2941 da Terceira Era, durante a jornada de Bilbo."],
+  ["IH09", "insano", "hobbit", "Qual anão cai no rio encantado da Floresta das Trevas e entra em sono profundo?", ["Bombur", "Dori", "Nori", "Ori"], 0, "Bombur cai no riacho encantado e dorme por dias, precisando ser carregado pelos companheiros."],
+  ["IH10", "insano", "hobbit", "Quais pedras preciosas Bard presenteia ao rei élfico depois da batalha?", ["Diamantes de Erebor", "Rubis de Smaug", "Esmeraldas de Girion", "Safiras de Valfenda"], 2, "Bard entrega ao rei élfico as esmeraldas de Girion como agradecimento pela ajuda aos habitantes da Cidade do Lago."],
+
+  // ──────────────── INSANO | O SENHOR DOS ANÉIS ────────────────
+  ["IL01", "insano", "lotr", "Qual é o nome do cavalo que Éomer empresta a Aragorn?", ["Arod", "Hasufel", "Shadowfax", "Brego"], 1, "Éomer empresta Hasufel a Aragorn; Arod fica com Legolas e Gimli."],
+  ["IL02", "insano", "lotr", "Qual integrante da Companhia Cinzenta morre nos Campos do Pelennor carregando o estandarte de Aragorn?", ["Beregond", "Halbarad", "Haldir", "Forlong"], 1, "Halbarad, um dos Dúnedain do Norte, leva o estandarte feito por Arwen e morre na batalha dos Campos do Pelennor."],
+  ["IL03", "insano", "lotr", "Quem é o pai de Denethor II, o último Regente de Gondor antes de Aragorn?", ["Ecthelion II", "Turgon", "Cirion", "Mardil"], 0, "Denethor II sucede seu pai, Ecthelion II, no governo de Gondor."],
+  ["IL04", "insano", "lotr", "A qual cidade pertencia a palantír usada por Denethor II?", ["Osgiliath", "Minas Ithil", "Minas Anor (Minas Tirith)", "Annúminas"], 2, "Denethor usa a Pedra de Anor, conservada em Minas Tirith, a antiga Minas Anor."],
+  ["IL05", "insano", "lotr", "Como se chamam os filhos gêmeos de Elrond que acompanham os Dúnedain?", ["Amrod e Amras", "Elladan e Elrohir", "Elendur e Valandil", "Fíli e Kíli"], 1, "Elladan e Elrohir seguem com a Companhia Cinzenta e participam da jornada de Aragorn."],
+  ["IL06", "insano", "lotr", "Qual príncipe de Dol Amroth é tio materno de Boromir e Faramir?", ["Imrahil", "Beregond", "Halbarad", "Forlong"], 0, "Imrahil é irmão de Finduilas, mãe de Boromir e Faramir, e comanda forças de Dol Amroth na guerra."],
+  ["IL07", "insano", "lotr", "Qual palavra em sindarin abre a Porta Oeste de Moria?", ["Elen", "Mellon", "Namárië", "Estel"], 1, "Mellon significa 'amigo'. Gandalf compreende que a inscrição pede que se diga essa palavra."],
+  ["IL08", "insano", "lotr", "Qual é o nome do primeiro rei de Rohan, ancestral de Théoden?", ["Eorl, o Jovem", "Brego", "Helm Mão-de-Martelo", "Fréaláf"], 0, "Eorl, o Jovem, conduziu os Éothéod em auxílio a Gondor e recebeu as terras que formaram Rohan."],
+  ["IL09", "insano", "lotr", "Quem descobre e replanta uma muda da Árvore Branca em Minas Tirith após a guerra?", ["Faramir", "Aragorn", "Gandalf", "Éomer"], 1, "Aragorn encontra, com Gandalf, uma muda na encosta do Mindolluin e a planta na cidadela."],
+  ["IL10", "insano", "lotr", "O que é o Livro Vermelho do Marco Ocidental (Red Book of Westmarch)?", ["Um manual de magia de Saruman", "O registro das aventuras escrito e transmitido por Bilbo, Frodo e Sam", "O diário pessoal de Denethor", "Um arquivo militar de Rohan"], 1, "O Livro Vermelho reúne relatos iniciados por Bilbo, continuados por Frodo e preservados por Sam e seus descendentes."],
+].map(([id, level, saga, question, options, answer, explanation]) => ({
+  id, level, saga, question, options, answer, explanation
+}));
+
+  </script>
+  <script>
+(() => {
+  'use strict';
+
+  const ACTIVE_KEY = 'terra-media.active.v1';
+  const BEST_KEY = 'terra-media.best.v1';
+  const LEVELS = {
+    facil: { title: 'Fácil', blurb: 'Personagens, lugares e a grande aventura.' },
+    medio: { title: 'Médio', blurb: 'Encontros, objetos e acontecimentos.' },
+    dificil: { title: 'Difícil', blurb: 'Detalhes dos livros e eventos decisivos.' },
+    insano: { title: 'Insano', blurb: 'Genealogias, histórias e pormenores.' }
+  };
+  const SAGAS = { todos: 'As duas obras', hobbit: 'O Hobbit', lotr: 'O Senhor dos Anéis' };
+  const root = document.querySelector('#app');
+  const bank = new Map(QUESTIONS.map(q => [q.id, q]));
+  let scope = 'todos';
+  let session = readJSON(ACTIVE_KEY);
+  let best = readJSON(BEST_KEY) || {};
+  let reviewOpen = false;
+
+  function readJSON(key) {
+    try { return JSON.parse(localStorage.getItem(key)); } catch { return null; }
+  }
+  function saveJSON(key, value) {
+    try { localStorage.setItem(key, JSON.stringify(value)); } catch { /* armazenamento indisponível */ }
+  }
+  function escapeHTML(value) {
+    return String(value).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
+  }
+  function shuffle(input) {
+    const arr = [...input];
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+  }
+  function isValidSession(s) {
+    return Boolean(s && LEVELS[s.level] && SAGAS[s.scope] && Array.isArray(s.ids)
+      && s.ids.length > 0 && s.ids.length <= 20 && Number.isInteger(s.index)
+      && s.index >= 0 && s.index <= s.ids.length && s.ids.every(id => bank.has(id)
+      && bank.get(id).level === s.level && (s.scope === 'todos' || bank.get(id).saga === s.scope))
+      && s.orders && typeof s.orders === 'object' && s.answers && typeof s.answers === 'object');
+  }
+  if (!isValidSession(session)) session = null;
+  if (!best || typeof best !== 'object' || Array.isArray(best)) best = {};
+
+  function footer() {
+    return `<footer class="footer"><span>Inspirado nos livros de J. R. R. Tolkien.</span><span>Funciona offline · Progresso salvo neste navegador</span></footer>`;
+  }
+  function header() {
+    return `<header class="topbar container">
+      <span class="brand-icon" aria-hidden="true">✦</span>
+      <span class="brand-name">TERRA<span class="brand-dash">—</span>MÉDIA</span>
+      <span class="topbar-label">QUIZ <span class="hide-mobile">/ TOLKIEN</span></span>
+    </header>`;
+  }
+  function render() {
+    const main = session && (session.index < session.ids.length || session.index === session.ids.length)
+      ? (screen === 'home' ? renderHome() : screen === 'result' || session.index === session.ids.length ? renderResult() : renderQuestion())
+      : renderHome();
+    root.innerHTML = header() + `<main class="container">${main}${footer()}</main>`;
+    document.title = (screen === 'home' ? 'Terra-média — Quiz Tolkien' : `${LEVELS[session.level].title} — Quiz Terra-média`);
+  }
+  let screen = session ? (session.index === session.ids.length ? 'result' : 'quiz') : 'home';
+
+  function getCurrentScore(s = session) {
+    return s.ids.reduce((score, id) => score + (Number.isInteger(s.answers[id]) && s.answers[id] === bank.get(id).answer ? 1 : 0), 0);
+  }
+  function renderHome() {
+    const active = session && session.index < session.ids.length;
+    const resumed = active ? `<section class="resume" aria-label="Partida em andamento">
+      <div><div class="eyebrow">SUA JORNADA CONTINUA</div>
+      <div class="resume-title">${LEVELS[session.level].title} · ${escapeHTML(SAGAS[session.scope])}</div>
+      <div class="resume-sub">Questão ${Math.min(session.index + 1, session.ids.length)} de ${session.ids.length} · ${getCurrentScore()} acerto(s) até agora</div></div>
+      <button class="resume-btn" data-action="resume">Retomar →</button>
+    </section>` : '';
+    const levels = Object.entries(LEVELS).map(([id, level], i) => {
+      const count = QUESTIONS.filter(q => q.level === id && (scope === 'todos' || q.saga === scope)).length;
+      const record = best[`${id}:${scope}`];
+      const bestText = Number.isInteger(record) ? `Recorde ${record}/${count}` : 'Não jogado';
+      return `<button class="level-card" data-level="${id}" aria-label="Jogar no nível ${level.title}, ${count} questões">
+        <div class="level-card-top"><span class="level-index">NÍVEL 0${i + 1}</span><span class="level-arrow" aria-hidden="true">↗</span></div>
+        <h3>${level.title}</h3><p>${level.blurb}</p>
+        <div class="level-bottom"><span>${count} perguntas</span><span class="${Number.isInteger(record) ? 'level-best' : ''}">${bestText}</span></div>
+      </button>`;
+    }).join('');
+    return `<section class="hero"><div class="hero-inner">
+      <div class="eyebrow">UM DESAFIO NA TERRA-MÉDIA</div>
+      <h1>Até onde vai seu <em>conhecimento?</em></h1>
+      <p>De Bolsão a Mordor. Teste o que sabe sobre <strong>O Hobbit</strong> e <strong>O Senhor dos Anéis</strong>, dos fatos mais conhecidos aos detalhes que só os leitores atentos recordam.</p>
+      <div class="stat-line"><span><i class="stat-dot"></i>80 perguntas originais</span><span><i class="stat-dot"></i>4 dificuldades</span><span><i class="stat-dot"></i>Sem cronômetro</span></div>
+    </div></section>
+    ${resumed}
+    <section aria-label="Escolha sua partida">
+      <div class="section-label"><h2>Escolha seu desafio</h2><span>Selecione uma obra</span></div>
+      <div class="filterbar" role="group" aria-label="Filtrar obra">
+        ${Object.entries(SAGAS).map(([key, label]) => `<button class="filter ${scope === key ? 'is-active' : ''}" data-scope="${key}" aria-pressed="${scope === key}">${escapeHTML(label)}</button>`).join('')}
+      </div>
+      <div class="level-grid">${levels}</div>
+    </section>`;
+  }
+  function renderQuestion() {
+    const q = bank.get(session.ids[session.index]);
+    const chosen = session.answers[q.id];
+    const answered = Number.isInteger(chosen);
+    const order = session.orders[q.id];
+    const score = getCurrentScore();
+    const choices = order.map((originalIndex, displayIndex) => {
+      const correct = q.answer === originalIndex;
+      const pickedWrong = answered && chosen === originalIndex && !correct;
+      const mark = answered && correct ? ' is-correct' : pickedWrong ? ' is-wrong' : '';
+      const icon = answered && correct ? '<span class="choice-icon" aria-hidden="true">✓</span>' : pickedWrong ? '<span class="choice-icon" aria-hidden="true">×</span>' : '';
+      return `<button class="choice${mark}" data-answer="${originalIndex}" ${answered ? 'disabled' : ''} ${answered && correct ? 'aria-label="Resposta correta: ' + escapeHTML(q.options[originalIndex]) + '"' : ''}>
+        <span class="choice-key" aria-hidden="true">${'ABCD'[displayIndex]}</span>
+        <span class="choice-text">${escapeHTML(q.options[originalIndex])}</span>${icon}</button>`;
+    }).join('');
+    const correct = chosen === q.answer;
+    const feedback = answered ? `<section class="feedback" aria-live="polite">
+      <div class="feedback-head ${correct ? '' : 'bad'}">${correct ? 'Resposta correta.' : 'Não foi desta vez.'}</div>
+      <p>${escapeHTML(q.explanation)}</p>
+      <button class="primary-btn" data-action="next">${session.index === session.ids.length - 1 ? 'Ver meu resultado' : 'Próxima pergunta'} <span aria-hidden="true">→</span></button>
+    </section>` : '';
+    return `<div class="quiz-shell">
+      <button class="back-link" data-action="home"><span aria-hidden="true">←</span> Voltar aos níveis</button>
+      <div class="progress-head"><strong>Questão ${session.index + 1} <span>de ${session.ids.length}</span></strong><span>${score} acerto${score === 1 ? '' : 's'}</span></div>
+      <div class="progress-track" role="progressbar" aria-label="Progresso do quiz" aria-valuemin="0" aria-valuemax="${session.ids.length}" aria-valuenow="${session.index + (answered ? 1 : 0)}"><div class="progress-fill" style="width:${((session.index + (answered ? 1 : 0)) / session.ids.length) * 100}%"></div></div>
+      <article class="question-panel">
+        <div class="question-meta"><span class="pill">${SAGAS[q.saga]}</span><span class="pill alt">${LEVELS[q.level].title}</span></div>
+        <h2>${escapeHTML(q.question)}</h2>
+        <div class="choices" role="group" aria-label="Alternativas">${choices}</div>
+        ${feedback}
+      </article>
+      <div class="quiz-hint">${answered ? 'Use Enter para avançar.' : 'Dica: use as teclas 1, 2, 3 ou 4 para responder.'}</div>
+    </div>`;
+  }
+  function renderResult() {
+    if (!session) return renderHome();
+    const score = getCurrentScore();
+    const total = session.ids.length;
+    const percent = Math.round(100 * score / total);
+    const failures = session.ids.filter(id => session.answers[id] !== bank.get(id).answer);
+    const slogan = percent === 100 ? 'Você conhece cada trilha.' : percent >= 80 ? 'Uma jornada memorável.' : percent >= 55 ? 'Você percorreu um bom caminho.' : 'Ainda há histórias por descobrir.';
+    const subtitle = percent === 100 ? 'Resultado perfeito. Nem os arquivos de Valfenda guardariam surpresas para você.' : 'Confira as explicações e tente novamente para melhorar sua pontuação.';
+    const reviews = session.ids.map((id, i) => ({ q: bank.get(id), index: i, chosen: session.answers[id] }))
+      .filter(item => item.chosen !== item.q.answer).map(({q, index, chosen}) => `<section class="review-item">
+        <div class="review-number">Questão ${index + 1} · ${escapeHTML(SAGAS[q.saga])}</div>
+        <div class="review-question">${escapeHTML(q.question)}</div>
+        <p class="review-line mine"><strong>Sua resposta:</strong> ${escapeHTML(q.options[chosen] ?? 'Sem resposta')}</p>
+        <p class="review-line right"><strong>Resposta correta:</strong> ${escapeHTML(q.options[q.answer])}</p>
+        <p class="review-explanation">${escapeHTML(q.explanation)}</p>
+      </section>`).join('');
+    return `<div class="result-shell">
+      <button class="back-link" data-action="home"><span aria-hidden="true">←</span> Voltar aos níveis</button>
+      <section class="result-panel" aria-label="Resultado final">
+        <div class="eyebrow">JORNADA CONCLUÍDA · ${escapeHTML(LEVELS[session.level].title.toUpperCase())}</div>
+        <h1>${slogan}</h1><p class="result-subtitle">${subtitle}</p>
+        <div class="score-circle" style="--score: ${percent}%"><div class="score-inner"><span class="score-value">${percent}%</span><span class="score-small">aproveitamento</span></div></div>
+        <div class="result-summary"><div><strong>${score}</strong><span>Acertos</span></div><div><strong>${total - score}</strong><span>Erros</span></div><div><strong>${total}</strong><span>Questões</span></div></div>
+        <div class="result-actions"><button class="primary-btn" data-action="retry">Jogar novamente <span aria-hidden="true">↗</span></button><button class="secondary-btn" data-action="home">Escolher outro nível</button></div>
+      </section>
+      <section class="review-panel">
+        <button class="review-toggle" aria-expanded="${reviewOpen}" data-action="review">Revisar meus erros (${failures.length}) <span aria-hidden="true">${reviewOpen ? '−' : '+'}</span></button>
+        ${reviewOpen ? `<div class="review-body">${reviews || '<div class="empty-review">Nenhum erro. Você acertou todas as perguntas!</div>'}</div>` : ''}
+      </section>
+    </div>`;
+  }
+  function showHome() { screen = 'home'; reviewOpen = false; render(); window.scrollTo({ top: 0, behavior: 'auto' }); }
+  function startGame(level, saga, force = false) {
+    if (!LEVELS[level] || !SAGAS[saga]) return;
+    if (!force && session && session.index < session.ids.length
+      && !window.confirm('Você tem uma partida em andamento. Iniciar outra partida substituirá esse progresso. Continuar?')) return;
+    const ids = shuffle(QUESTIONS.filter(q => q.level === level && (saga === 'todos' || saga === q.saga)).map(q => q.id));
+    if (!ids.length) return;
+    session = { level, scope: saga, ids, index: 0,
+      answers: {}, orders: Object.fromEntries(ids.map(id => [id, shuffle([0, 1, 2, 3])])) };
+    saveJSON(ACTIVE_KEY, session);
+    screen = 'quiz'; reviewOpen = false; render(); window.scrollTo({ top: 0, behavior: 'auto' });
+  }
+  function selectAnswer(answerIndex) {
+    if (screen !== 'quiz' || !session || session.index >= session.ids.length) return;
+    const q = bank.get(session.ids[session.index]);
+    if (Number.isInteger(session.answers[q.id]) || ![0,1,2,3].includes(answerIndex)) return;
+    session.answers[q.id] = answerIndex;
+    saveJSON(ACTIVE_KEY, session);
+    render();
+  }
+  function nextQuestion() {
+    if (!session || screen !== 'quiz' || session.index >= session.ids.length) return;
+    const id = session.ids[session.index];
+    if (!Number.isInteger(session.answers[id])) return;
+    session.index++;
+    saveJSON(ACTIVE_KEY, session);
+    if (session.index === session.ids.length) {
+      const key = `${session.level}:${session.scope}`;
+      const value = getCurrentScore();
+      best[key] = Math.max(Number(best[key]) || 0, value);
+      saveJSON(BEST_KEY, best);
+      screen = 'result';
+    }
+    render(); window.scrollTo({ top: 0, behavior: 'auto' });
+  }
+  root.addEventListener('click', event => {
+    const button = event.target.closest('button');
+    if (!button || !root.contains(button)) return;
+    if (button.dataset.scope) { scope = button.dataset.scope; render(); return; }
+    if (button.dataset.level) { startGame(button.dataset.level, scope); return; }
+    if (button.dataset.answer !== undefined) { selectAnswer(Number(button.dataset.answer)); return; }
+    switch (button.dataset.action) {
+      case 'home': showHome(); break;
+      case 'resume': screen = 'quiz'; render(); window.scrollTo({ top: 0, behavior: 'auto' }); break;
+      case 'next': nextQuestion(); break;
+      case 'retry': startGame(session.level, session.scope, true); break;
+      case 'review': reviewOpen = !reviewOpen; render(); break;
+    }
+  });
+  document.addEventListener('keydown', event => {
+    if (screen !== 'quiz' || !session || event.altKey || event.ctrlKey || event.metaKey || event.repeat) return;
+    if (event.key === 'Escape') { showHome(); return; }
+    if (session.index >= session.ids.length) return;
+    const q = bank.get(session.ids[session.index]);
+    if (Number.isInteger(session.answers[q.id])) {
+      if (event.key === 'Enter' && (event.target === document.body || !event.target.closest('button'))) { event.preventDefault(); nextQuestion(); }
+      return;
+    }
+    if (/^[1-4]$/.test(event.key)) { event.preventDefault(); selectAnswer(session.orders[q.id][Number(event.key) - 1]); }
+  });
+  // Checagem do banco: 80 perguntas, metade de cada obra, 20 em cada dificuldade.
+  const expected = Object.keys(LEVELS).every(level => QUESTIONS.filter(q => q.level === level).length === 20
+    && QUESTIONS.filter(q => q.level === level && q.saga === 'hobbit').length === 10
+    && QUESTIONS.filter(q => q.level === level && q.saga === 'lotr').length === 10);
+  if (QUESTIONS.length !== 80 || !expected || bank.size !== 80 || QUESTIONS.some(q => q.options.length !== 4 || !Number.isInteger(q.answer) || q.answer < 0 || q.answer > 3)) {
+    console.error('O banco de perguntas está inconsistente.');
+    root.innerHTML = '<p class="loading">Não foi possível carregar o banco de perguntas.</p>';
+    return;
+  }
+  render();
+})();
+
+  </script>
 </body>
 </html>
